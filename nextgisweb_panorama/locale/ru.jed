@@ -1,0 +1,34 @@
+{
+  "": {
+    "domain": "panorama",
+    "lang": "ru",
+    "plural_forms": "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)"
+  },
+  "Panorama not found": [
+    "Панорама не найдена"
+  ],
+  "Panorama with id = %d was not found in feature with id = %d.": [
+    "Панорама с идентификатором = %s не найдена для объекта с идентификатором = %d"
+  ],
+  "The panorama may have been deleted or an error in the address.": [
+    "Панорама могла быть удалена или ошибка в адресе"
+  ],
+  "File type \"%s\" not in valid mimes. %s.": [
+    "Тип файла \"%d\" не является валидным типом. %s."
+  ],
+  "Display name": [
+    "Наименование"
+  ],
+  "Keyname": [
+    "Ключ"
+  ],
+  "Panorama": [
+    "Панорама"
+  ],
+  "Upload": [
+    "Загрузить"
+  ],
+  "Delete": [
+    "Удалить"
+  ]
+}

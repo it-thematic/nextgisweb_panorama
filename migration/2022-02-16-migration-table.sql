@@ -1,0 +1,1 @@
+INSERT INTO core_migration VALUES ('panorama', '00000000');

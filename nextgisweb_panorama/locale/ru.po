@@ -1,0 +1,37 @@
+#: exception.py:12
+msgid "Panorama not found"
+msgstr "Панорама не найдена"
+
+#: exception.py:13
+#, python-format
+msgid "Panorama with id = %d was not found in feature with id = %d."
+msgstr "Панорама с идентификатором = %s не найдена для объекта с идентификатором = %d"
+
+#: exception.py:14
+msgid "The panorama may have been deleted or an error in the address."
+msgstr "Панорама могла быть удалена или ошибка в адресе"
+
+#: model.py:27
+#, python-format
+msgid "File type \"%s\" not in valid mimes. %s."
+msgstr "Тип файла \"%d\" не является валидным типом. %s."
+
+#: amd/ngw-panorama/EditorWidget.js:63
+msgid "Display name"
+msgstr "Наименование"
+
+#: amd/ngw-panorama/EditorWidget.js:68
+msgid "Keyname"
+msgstr "Ключ"
+
+#: amd/ngw-panorama/EditorWidget.js:77
+msgid "Panorama"
+msgstr "Панорама"
+
+#: amd/ngw-panorama/template/EditorWidget.hbs:9
+msgid "Upload"
+msgstr "Загрузить"
+
+#: amd/ngw-panorama/template/EditorWidget.hbs:13
+msgid "Delete"
+msgstr "Удалить"

@@ -1,0 +1,33 @@
+<div data-dojo-type="${baseClass}" data-dojo-attach-point="focusNode">
+
+    <div data-dojo-attach-point="toolbar" data-dojo-type="dijit/Toolbar"
+         data-dojo-props="region: 'top'"
+         style="margin-right: 1px;">
+
+        <div data-dojo-attach-point="btnUpload" data-dojo-type="ngw-file-upload/FileUploader"
+             data-dojo-props="iconClass: 'dijitIconNewTask', multiple: true, uploadOnSelect: true"
+             label="{{gettext 'Upload'}}"></div>
+
+        <div data-dojo-attach-point="btnDelete" data-dojo-type="dijit/form/Button"
+             data-dojo-props="iconClass: 'dijitIconDelete'"
+             label="{{gettext 'Delete'}}"></div>
+
+        <div data-dojo-attach-point="btnBeautify" data-dojo-type="dijit/form/Button"
+             data-dojo-props="iconClass: 'dijitIconEditProperty'"
+             label="{{gettext 'Beautify'}}"></div>
+
+    </div>
+
+    <div data-dojo-type="dojox/layout/TableContainer" data-dojo-props="cols:1, showLabels:false">
+
+        <div data-dojo-type="dijit/layout/BorderContainer"
+             data-dojo-attach-point="wScenes"
+             style="border: 1px solid #999;"></div>
+
+        <div data-dojo-type="ngw-pyramid/form/CodeMirror"
+             data-dojo-attach-point="wPanorama"
+             data-dojo-props="lineNumbers: true, lang: 'javascript'"
+             style="width: 100%; border: 1px solid #999;"></div>
+    </div>
+
+</div>

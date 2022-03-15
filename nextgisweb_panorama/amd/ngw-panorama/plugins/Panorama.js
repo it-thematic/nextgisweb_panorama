@@ -33,6 +33,17 @@ define([
             this._bindEvents();
         },
 
+        _layoutChildren: function () {
+            this.inherited(arguments);
+            if (!!this._timerResize) {
+                clearTimeout(this._timerResize);
+            }
+            this._timerResize = setTimeout(() => {
+                if (!!!this.viewer) { return; }
+                this.viewer.autoSize();
+            }, 500);
+        },
+
         initialize_viewer: function (nodes) {
             if (!!!this.viewer) {
                 this.viewer = new psv.PSV.Viewer({
@@ -126,9 +137,9 @@ define([
                 if (!this.tabContainer.getChildren().length) {
                    this.display.mapContainer.addChild(this.tabContainer);
                 }
+                this.tabContainer.addChild(this.pane);
+                this.tabContainer.selectChild(this.pane);
             }
-            this.tabContainer.addChild(this.pane);
-            this.tabContainer.selectChild(this.pane);
         },
 
         _buildPane: function (layerId, item) {

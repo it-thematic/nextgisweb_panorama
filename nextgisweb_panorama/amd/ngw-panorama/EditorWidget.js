@@ -159,6 +159,7 @@ define([
                         panorama.push({
                             id: element.name,
                             name: element.name,
+                            links:[]
                         });
                         return
                     }

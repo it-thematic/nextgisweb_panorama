@@ -54,7 +54,7 @@ def normalize_feature_panorama(request, feature):
                                               sid=pfiles[scene['id']].id
                                               )
         if not scene.setdefault("position", list()):
-            scene["position"] = pfiles[scene['id']].panorama
+            scene["position"] = pfiles[scene['id']].position
     return panorama
 
 

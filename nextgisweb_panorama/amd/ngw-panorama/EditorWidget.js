@@ -91,13 +91,6 @@ define([
             this.store = new Observable(new Memory({idProperty: "lid"}));
         },
 
-        /** абстрактная функция из DisplayWidget для отображения значения для виджета просмотра**/
-        renderValue: function (value) {
-            this.inherited(arguments);
-            console.log('Value: ', value);
-
-        },
-
         _getValueAttr: function () {
             this.inherited(arguments);
             var value = {};
@@ -110,7 +103,6 @@ define([
                 value['scenes'].push(c);
             })
 
-            console.log('ngw-panorama/EditorWidget: _getValueAttr');
             return value;
         },
 
@@ -127,8 +119,6 @@ define([
                 var value = lang.clone(itm);
                 this.store.add(value);
             }, this);
-
-            console.log('ngw-panorama/EditorWidget: _setValueAttr.');
         },
 
         buildRendering: function () {
@@ -189,10 +179,6 @@ define([
                     panorama.forEach((elem) => {
                         if (!!!elem.links) { return; }
                         elem.links = elem.links.filter((itm) => itm.nodeId !== nodeId);
-                        if (elem.links.length === 0) {
-                            console.log('it is impossible because the scene should have at least one link')
-                            delete elem.links;
-                        }
                     })
                     this.store.remove(key);
                 }

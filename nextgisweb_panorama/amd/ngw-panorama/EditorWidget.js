@@ -25,7 +25,8 @@ define([
     "dgrid/Selection",
     "dgrid/editor",
     "dgrid/extensions/DijitRegistry",
-    "dijit/layout/BorderContainer"
+    "dijit/layout/BorderContainer",
+    "ngw-pyramid/form/CodeMirror"
 
 ], function (
     declare,

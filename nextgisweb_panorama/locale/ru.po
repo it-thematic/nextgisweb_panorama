@@ -11,20 +11,20 @@ msgstr "Панорама с идентификатором = %s не найде�
 msgid "The panorama may have been deleted or an error in the address."
 msgstr "Панорама могла быть удалена или ошибка в адресе"
 
-#: model.py:27
+#: model.py:26
 #, python-format
 msgid "File type \"%s\" not in valid mimes. %s."
 msgstr "Тип файла \"%d\" не является валидным типом. %s."
 
-#: amd/ngw-panorama/EditorWidget.js:63
+#: amd/ngw-panorama/EditorWidget.js:71
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-panorama/EditorWidget.js:68
+#: amd/ngw-panorama/EditorWidget.js:76
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-panorama/EditorWidget.js:77
+#: amd/ngw-panorama/EditorWidget.js:86 amd/ngw-panorama/plugins/Panorama.js:104
 msgid "Panorama"
 msgstr "Панорама"
 
@@ -35,3 +35,8 @@ msgstr "Загрузить"
 #: amd/ngw-panorama/template/EditorWidget.hbs:13
 msgid "Delete"
 msgstr "Удалить"
+
+#: amd/ngw-panorama/template/EditorWidget.hbs:17
+msgid "Beautify"
+msgstr "Выровнять"
+

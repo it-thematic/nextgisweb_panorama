@@ -3,7 +3,7 @@ define([
     "dojo/_base/lang",
     "dojo/topic",
     "dijit/layout/BorderContainer",
-    "dijit/MenuItem",
+    "dijit/form/Button",
     "dijit/layout/TabContainer",
     "openlayers/ol",
     "ngw-webmap/plugin/_PluginBase",
@@ -15,7 +15,7 @@ define([
     lang,
     topic,
     BorderContainer,
-    MenuItem,
+    Button,
     TabContainer,
     ol,
     _PluginBase,
@@ -100,9 +100,10 @@ define([
         constructor: function () {
             var plugin = this;
 
-            this.menuItem = new MenuItem({
+            this.menuItem = new Button({
                 label: i18n.gettext("Panorama"),
-                iconClass: "iconMap",
+                showLabel: false,
+                iconClass: "material-icons material-icons-enable icon-panorama-photosphere",
                 disabled: true,
                 onClick: function () {
                     plugin.openPanorama();
@@ -123,8 +124,8 @@ define([
         },
 
         postCreate: function () {
-            if (this.display.layersPanel && this.display.layersPanel.contentWidget.itemMenu) {
-                this.display.layersPanel.contentWidget.itemMenu.addChild(this.menuItem);
+            if (this.display.layersPanel && this.display.layersPanel.contentWidget.toolbarMenu) {
+                this.display.layersPanel.contentWidget.toolbarMenu.addChild(this.menuItem);
             }
 
         },

@@ -103,7 +103,7 @@ define([
             this.menuItem = new Button({
                 label: i18n.gettext("Panorama"),
                 showLabel: false,
-                iconClass: "material-icons material-icons-enable icon-panorama-photosphere",
+                iconClass: "material-icons material-icons-enable icon-panorama",
                 disabled: true,
                 onClick: function () {
                     plugin.openPanorama();

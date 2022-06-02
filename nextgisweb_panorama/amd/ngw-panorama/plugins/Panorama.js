@@ -50,12 +50,14 @@ define([
                     caption: this.title,
                     container: this.domNode,
                     plugins: [
-                        [psv.MP.MarkersPlugin, {}],
-                        psv.CP.CompassPlugin,
+                        // psv.SP.SettingsPlugin,
+                        // psv.CP.CompassPlugin,
                         [psv.VTP.VirtualTourPlugin, {
                             positionMode: psv.VTP.MODE_GPS,
                             renderMode: psv.VTP.MODE_3D,
-                            nodes: nodes
+                            nodes: nodes,
+                            arrowPosition: 'top'
+                            // linksOnCompass: true
                         }],
                     ]
                 });
@@ -118,8 +120,7 @@ define([
 
             this.display.watch("item", function (attr, oldVal, newVal) {
                 var itemConfig = plugin.display.get("itemConfig");
-                plugin.menuItem.set("disabled", !(itemConfig.type == "layer" &&
-                    itemConfig.plugin[plugin.identity]));
+                plugin.menuItem.set("disabled", !(itemConfig && itemConfig.type == "layer" && itemConfig.plugin[plugin.identity]));
             });
         },
 

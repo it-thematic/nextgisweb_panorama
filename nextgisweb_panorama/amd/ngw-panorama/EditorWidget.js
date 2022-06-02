@@ -189,8 +189,6 @@ define([
             this.btnBeautify.on('click', lang.hitch(this, function () {
                 this.wPanorama.set("value", json.stringify(json.parse(this.wPanorama.get("value")), null, 4))
             }));
-
-            console.log('ngw-panorama/EditorWidget: buildRendering');
         }
     });
 });

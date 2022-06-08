@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from json import dumps, loads
+from math import atan2
 
 from nextgisweb.feature_layer.extension import FeatureExtension
 from nextgisweb.models import DBSession
@@ -23,6 +24,7 @@ class FeaturePanoramaExtension(FeatureExtension):
             resource_id=self.layer.id,
             feature_id=feature.id
         )
+        scene_dict = {scene.keyname: scene for scene in scene_instances}
         scenes = [itm.serialize() for itm in scene_instances]
         result['scenes'] = scenes
 
@@ -35,14 +37,16 @@ class FeaturePanoramaExtension(FeatureExtension):
 
         panorama = panorama_instance.panorama
         if panorama:
-            scene_dict = {scene.keyname: scene for scene in scene_instances}
             for scene in panorama:
                 if not scene.get('position'):
                     scene['position'] = scene_dict[scene['id']].position
         else:
             panorama = [
-                {'id': scene.keyname, 'name': scene.display_name, 'position': scene.position}
-                for scene in scene_instances
+                {
+                    'id': scene.keyname,
+                    'name': scene.display_name,
+                    'position': scene.position
+                } for scene in scene_instances
             ]
             for i in range(len(panorama)):
                 if i == 0:
@@ -51,6 +55,16 @@ class FeaturePanoramaExtension(FeatureExtension):
                     panorama[i]['links'] = [{'nodeId': panorama[i-1]['id']}]
                 else:
                     panorama[i]['links'] = [{'nodeId': panorama[i-1]['id']}, {'nodeId': panorama[i+1]['id']}]
+
+        for scene in panorama:
+            if len(scene.setdefault("links", [])) == 0:
+                continue
+            next_point = scene_dict[scene["links"][int(len(scene["links"]) != 1)]["nodeId"]].serialize()
+            # latitude = x, longitude = y
+            dy = next_point["position"][0] - scene["position"][0]
+            dx = next_point["position"][1] - scene["position"][1]
+            pan = atan2(dy, dx)
+            scene.setdefault("sphereCorrection", dict())["pan"] = -pan
 
         result['panorama'] = panorama
 

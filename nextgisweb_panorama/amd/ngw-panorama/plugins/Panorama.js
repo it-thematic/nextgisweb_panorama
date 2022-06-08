@@ -39,7 +39,9 @@ define([
                 clearTimeout(this._timerResize);
             }
             this._timerResize = setTimeout(() => {
-                if (!!!this.viewer) { return; }
+                if (!!!this.viewer) {
+                    return;
+                }
                 this.viewer.autoSize();
             }, 500);
         },
@@ -50,14 +52,12 @@ define([
                     caption: this.title,
                     container: this.domNode,
                     plugins: [
-                        // psv.SP.SettingsPlugin,
-                        // psv.CP.CompassPlugin,
+                        psv.CP.CompassPlugin,
                         [psv.VTP.VirtualTourPlugin, {
                             positionMode: psv.VTP.MODE_GPS,
                             renderMode: psv.VTP.MODE_3D,
                             nodes: nodes,
-                            arrowPosition: 'top'
-                            // linksOnCompass: true
+                            linksOnCompass: true
                         }],
                     ]
                 });
@@ -73,6 +73,9 @@ define([
         },
 
         _bindPanoramaEvents: function () {
+            this.viewer.on('position-updated', (e, position) => {
+                console.info(position);
+            })
             var vtp = this.viewer.getPlugin(psv.VTP.VirtualTourPlugin);
             vtp.on('node-changed', lang.hitch(this, this._onPanoramaNodeChange));
         },
@@ -84,6 +87,19 @@ define([
             let coord = ol.proj.transform(node.position, 'EPSG:4326', 'EPSG:3857')
             let point = new ol.geom.Point(coord);
             this.plugin.display.featureHighlighter._highlightFeature({olGeometry: point});
+
+            let idx = node.links.length > 1 ? 1 : 0;
+            let nextLink = node.links[idx];
+
+            let nextPoint = nextLink.position;
+            let currentPoint = node.position;
+            // Расчёт угла поворота от оси Х направленной вверх к следующей панорама с началом отсчёта в текущей точке
+            let dy = nextPoint[0] - currentPoint[0], dx = nextPoint[1] - currentPoint[1];
+            console.log('DX = ', dx, '. DY = ', dy);
+            let rotationAngle = Math.atan2(dy, dx);
+            console.log('Rotate to ', rotationAngle, ' radians');
+            console.log('Rotate to ', rotationAngle * 180 / Math.PI, ' degrees');
+            this.viewer.rotate({longitude: rotationAngle, latitude: 0});
         },
 
         loadPanoramaOfFeature: function (e) {
@@ -91,7 +107,9 @@ define([
 
             api.route('feature_panorama.item', {id: layerId, fid: featureId})
                 .get()
-                .then(lang.hitch(this, (data) => {(data !== null) && (data.length > 0) ? widget.initialize_viewer(data) : null }))
+                .then(lang.hitch(this, (data) => {
+                    (data !== null) && (data.length > 0) ? widget.initialize_viewer(data) : null
+                }))
         }
     });
 
@@ -137,7 +155,7 @@ define([
             if (!!!this.pane) {
                 this.pane = this._buildPane(layerId, item);
                 if (!this.tabContainer.getChildren().length) {
-                   this.display.mapContainer.addChild(this.tabContainer);
+                    this.display.mapContainer.addChild(this.tabContainer);
                 }
                 this.tabContainer.addChild(this.pane);
                 this.tabContainer.selectChild(this.pane);

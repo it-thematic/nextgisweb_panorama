@@ -2,6 +2,7 @@
 import json
 
 from io import BytesIO
+from math import atan2
 
 from PIL import Image
 from pyramid.response import Response
@@ -37,24 +38,32 @@ def normalize_feature_panorama(request, feature):
 
     * Нормализация url-адресов
     """
-    pfiles = {
-        pfile.keyname: pfile
-        for pfile in FeatureScene.filter_by(resource_id=feature.layer.id, feature_id=feature.id)
-    }
+    fscenes = {scene.keyname: scene
+               for scene in FeatureScene.filter_by(resource_id=feature.layer.id, feature_id=feature.id)
+               }
 
-    pins = FeaturePanorama.filter_by(resource_id=feature.layer.id, feature_id=feature.id).one_or_none()
-    if pins is None:
+    fpanorama = FeaturePanorama.filter_by(resource_id=feature.layer.id, feature_id=feature.id).one_or_none()
+    if fpanorama is None:
         return
 
-    panorama = pins.panorama
+    panorama = fpanorama.panorama
     for scene in panorama:
         scene["panorama"] = request.route_url('feature_panorama.scene.item.image',
                                               id=feature.layer.id,
                                               fid=feature.id,
-                                              sid=pfiles[scene['id']].id
+                                              sid=fscenes[scene['id']].id
                                               )
         if not scene.setdefault("position", list()):
-            scene["position"] = pfiles[scene['id']].position
+            scene["position"] = fscenes[scene['id']].position
+        if len(scene.setdefault("links", [])) == 0:
+            continue
+        next_point = fscenes[scene["links"][int(len(scene["links"]) != 1)]["nodeId"]].serialize()
+        # latitude = x, longitude = y
+        dy = next_point["position"][0] - scene["position"][0]
+        dx = next_point["position"][1] - scene["position"][1]
+        pan = atan2(dy, dx)
+        scene["sphereCorrection"]["pan"] = -pan
+
     return panorama
 
 

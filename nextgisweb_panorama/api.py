@@ -62,7 +62,7 @@ def normalize_feature_panorama(request, feature):
         dy = next_point["position"][0] - scene["position"][0]
         dx = next_point["position"][1] - scene["position"][1]
         pan = atan2(dy, dx)
-        scene["sphereCorrection"]["pan"] = -pan
+        scene.setdefault("sphereCorrection", dict())["pan"] = -pan
 
     return panorama
 

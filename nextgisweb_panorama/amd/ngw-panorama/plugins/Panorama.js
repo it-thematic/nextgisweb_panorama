@@ -73,9 +73,6 @@ define([
         },
 
         _bindPanoramaEvents: function () {
-            this.viewer.on('position-updated', (e, position) => {
-                console.info(position);
-            })
             var vtp = this.viewer.getPlugin(psv.VTP.VirtualTourPlugin);
             vtp.on('node-changed', lang.hitch(this, this._onPanoramaNodeChange));
         },
@@ -88,22 +85,36 @@ define([
             let point = new ol.geom.Point(coord);
             this.plugin.display.featureHighlighter._highlightFeature({olGeometry: point});
 
-            let idx = node.links.length > 1 ? 1 : 0;
-            let nextLink = node.links[idx];
+            let nextLink = this._calculateNextNode(node, data);
+            if (!!!nextLink) {return; }
 
             let nextPoint = nextLink.position;
             let currentPoint = node.position;
             // Расчёт угла поворота от оси Х направленной вверх к следующей панорама с началом отсчёта в текущей точке
             let dy = nextPoint[0] - currentPoint[0], dx = nextPoint[1] - currentPoint[1];
-            console.log('DX = ', dx, '. DY = ', dy);
             let rotationAngle = Math.atan2(dy, dx);
-            console.log('Rotate to ', rotationAngle, ' radians');
-            console.log('Rotate to ', rotationAngle * 180 / Math.PI, ' degrees');
             this.viewer.rotate({longitude: rotationAngle, latitude: 0});
+        },
+
+        _calculateNextNode: function (node, data) {
+            /*
+            data.fromNode - с какой панорамы перешли
+            data.fromLink - на какую ссылку нажимали при переходе
+            data.fromLinkPosition - какие были координаты link
+             */
+            let previousLink = data.fromNode;
+            let links = [...node.links];
+
+            if (!previousLink || links.length === 1) { return links[0]; }
+
+            let indexOfPreviousLink = links.findIndex(item => item.nodeId === previousLink.id);
+            if (indexOfPreviousLink !== undefined) { links.splice(indexOfPreviousLink, 1); }
+            return links[0];
         },
 
         loadPanoramaOfFeature: function (e) {
             var layerId = e.layerId, featureId = e.featureId, widget = this;
+            if (!!!layerId || !!!featureId) { return; }
 
             api.route('feature_panorama.item', {id: layerId, fid: featureId})
                 .get()

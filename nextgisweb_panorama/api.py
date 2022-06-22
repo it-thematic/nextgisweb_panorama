@@ -7,6 +7,7 @@ from math import atan2
 from PIL import Image
 from pyramid.response import Response
 
+from nextgisweb import db
 from nextgisweb.env import env
 from nextgisweb.feature_attachment.exif import EXIF_ORIENTATION_TAG, ORIENTATIONS
 from nextgisweb.feature_layer.exception import FeatureNotFound
@@ -183,6 +184,13 @@ def ppost(resource, request):
         charset='utf-8')
 
 
+def pcheck(resource, request):
+    """Проверка, что в ресурсе есть объекты с панорамами"""
+    request.resource_permission(DataScope.read)
+
+    return dict(count=DBSession.query(db.func.count(FeaturePanorama.feature_id)).filter_by(resource=resource).scalar())
+
+
 def setup_pyramid(comp, config):
     panoramaurl = '/api/resource/{id}/feature/{fid}/panorama/'
     scenecurl = '/api/resource/{id}/feature/{fid}/scene/'
@@ -209,3 +217,8 @@ def setup_pyramid(comp, config):
         factory=resource_factory) \
         .add_view(pget, request_method='GET') \
         .add_view(ppost, request_method='POST')
+
+    config.add_route(
+        'resource.panorama.check', '/api/resource/{id}/panorama/check',
+        factory=resource_factory) \
+        .add_view(pcheck, request_method='GET', renderer='json')

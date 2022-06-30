@@ -56,7 +56,10 @@ class FeaturePanoramaExtension(FeatureExtension):
                 else:
                     panorama[i]['links'] = [{'nodeId': panorama[i-1]['id']}, {'nodeId': panorama[i+1]['id']}]
 
+        # Расчет коррекции сферы
         for scene in panorama:
+            if scene.get("sphereCorrection", None):
+                continue
             if len(scene.setdefault("links", [])) == 0:
                 continue
             next_point = scene_dict[scene["links"][int(len(scene["links"]) != 1)]["nodeId"]].serialize()

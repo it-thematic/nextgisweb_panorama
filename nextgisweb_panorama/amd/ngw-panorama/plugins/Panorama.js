@@ -149,11 +149,15 @@ define([
 
             this.display.watch("item", function (attr, oldVal, newVal) {
                 var itemConfig = plugin.display.get("itemConfig");
-                api.route('resource.panorama.check', {id: itemConfig.layerId})
-                    .get()
-                    .then(lang.hitch(this, function (data) {
-                        plugin.menuItem.set("disabled", data.count === 0);
-                    }));
+                if (itemConfig.type !== 'layer') {
+                    plugin.menuItem.set("disabled", true);
+                } else {
+                    api.route('resource.panorama.check', {id: itemConfig.layerId})
+                        .get()
+                        .then(lang.hitch(this, function (data) {
+                            plugin.menuItem.set("disabled", data.count === 0);
+                        }));
+                }
             });
         },
 

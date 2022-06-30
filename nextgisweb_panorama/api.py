@@ -58,6 +58,8 @@ def normalize_feature_panorama(request, feature):
             scene["position"] = fscenes[scene['id']].position
         if len(scene.setdefault("links", [])) == 0:
             continue
+        if scene.get("sphereCorrection"):
+            continue
         next_point = fscenes[scene["links"][int(len(scene["links"]) != 1)]["nodeId"]].serialize()
         # latitude = x, longitude = y
         dy = next_point["position"][0] - scene["position"][0]

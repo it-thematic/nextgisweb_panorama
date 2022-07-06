@@ -16,15 +16,15 @@ msgstr "Панорама могла быть удалена или ошибка 
 msgid "File type \"%s\" not in valid mimes. %s."
 msgstr "Тип файла \"%d\" не является валидным типом. %s."
 
-#: amd/ngw-panorama/EditorWidget.js:71
+#: amd/ngw-panorama/EditorWidget.js:74
 msgid "Display name"
 msgstr "Наименование"
 
-#: amd/ngw-panorama/EditorWidget.js:76
+#: amd/ngw-panorama/EditorWidget.js:79
 msgid "Keyname"
 msgstr "Ключ"
 
-#: amd/ngw-panorama/EditorWidget.js:86 amd/ngw-panorama/plugins/Panorama.js:104
+#: amd/ngw-panorama/EditorWidget.js:89 amd/ngw-panorama/plugins/Panorama.js:135
 msgid "Panorama"
 msgstr "Панорама"
 
@@ -39,4 +39,8 @@ msgstr "Удалить"
 #: amd/ngw-panorama/template/EditorWidget.hbs:17
 msgid "Beautify"
 msgstr "Выровнять"
+
+#: amd/ngw-panorama/template/EditorWidget.hbs:21
+msgid "Reverse"
+msgstr "Обратный порядок"
 

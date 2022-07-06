@@ -20,6 +20,7 @@ define([
     "ngw-file-upload/FileUploader",
     "dijit/form/Button",
     "dijit/form/Textarea",
+    "dijit/form/CheckBox",
     "dgrid/OnDemandGrid",
     "dgrid/Keyboard",
     "dgrid/Selection",
@@ -46,12 +47,14 @@ define([
     template,
     Button,
     Textarea,
+    CheckBox,
     Grid,
     Keyboard,
     Selection,
     editor,
     DijitRegistry,
-    BorderContainer
+    BorderContainer,
+
 ) {
 
     function fileSizeToString(size) {
@@ -95,7 +98,7 @@ define([
         _getValueAttr: function () {
             this.inherited(arguments);
             var value = {};
-            value['panorama'] = json.stringify(json.parse(this.wPanorama.get("value")));
+            value['panorama'] = json.parse(this.wPanorama.get("value") || "[]");
 
             value['scenes'] = [];
             this.store.query().forEach(function (f) {
@@ -103,7 +106,7 @@ define([
                 c.lid = undefined;
                 value['scenes'].push(c);
             })
-
+            value['reverse'] = this.chkReverse.get("checked");
             return value;
         },
 
@@ -120,6 +123,7 @@ define([
                 var value = lang.clone(itm);
                 this.store.add(value);
             }, this);
+            this.chkReverse.set('checked', false);
         },
 
         buildRendering: function () {
@@ -136,7 +140,8 @@ define([
             this.btnUpload.on("complete", lang.hitch(this, function (data) {
                 var panorama = json.parse(this.wPanorama.get("value")) || [];
 
-                array.forEach(data.upload_meta, (element) => {
+                if (!!this.chkReverse.get("checked")) { data.upload_meta.reverse(); }
+                data.upload_meta.forEach((element) => {
                     this.store.put({
                         display_name: element.name,
                         keyname: element.name,

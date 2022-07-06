@@ -16,6 +16,7 @@ from nextgisweb.resource import DataScope, resource_factory
 
 from .exception import SceneNotFound
 from .model import FeaturePanorama, FeatureScene
+from .extension import deserialize_pano_data
 
 
 def scene_or_not_found(resource_id, feature_id, scene_id):
@@ -39,34 +40,22 @@ def normalize_feature_panorama(request, feature):
 
     * Нормализация url-адресов
     """
-    fscenes = {scene.keyname: scene
-               for scene in FeatureScene.filter_by(resource_id=feature.layer.id, feature_id=feature.id)
-               }
-
-    fpanorama = FeaturePanorama.filter_by(resource_id=feature.layer.id, feature_id=feature.id).one_or_none()
-    if fpanorama is None:
+    pano_instance = FeaturePanorama.filter_by(resource_id=feature.layer.id, feature_id=feature.id).one_or_none()
+    if pano_instance is None:
         return
+    scene_instance_dict = {fs.keyname: fs.id
+                           for fs in FeatureScene.
+                           filter_by(resource_id=feature.layer.id, feature_id=feature.id).
+                           with_entities(FeatureScene.id, FeatureScene.keyname)
+                           }
 
-    panorama = fpanorama.panorama
+    panorama = pano_instance.panorama
     for scene in panorama:
         scene["panorama"] = request.route_url('feature_panorama.scene.item.image',
                                               id=feature.layer.id,
                                               fid=feature.id,
-                                              sid=fscenes[scene['id']].id
+                                              sid=scene_instance_dict[scene['id']]
                                               )
-        if not scene.setdefault("position", list()):
-            scene["position"] = fscenes[scene['id']].position
-        if len(scene.setdefault("links", [])) == 0:
-            continue
-        if scene.get("sphereCorrection"):
-            continue
-        next_point = fscenes[scene["links"][int(len(scene["links"]) != 1)]["nodeId"]].serialize()
-        # latitude = x, longitude = y
-        dy = next_point["position"][0] - scene["position"][0]
-        dx = next_point["position"][1] - scene["position"][1]
-        pan = atan2(dy, dx)
-        scene.setdefault("sphereCorrection", dict())["pan"] = -pan
-
     return panorama
 
 
@@ -104,7 +93,7 @@ def si_get(resource, request):
     return Response(json.dumps(result), content_type='application/json', charset='utf-8')
 
 
-def image(resource, request):
+def s_image(resource, request):
     request.resource_permission(DataScope.read)
 
     scene = scene_or_not_found(resource.id, request.matchdict['fid'], request.matchdict['sid'])
@@ -153,7 +142,7 @@ def pget(resource, request):
         charset='utf-8')
 
 
-def ppost(resource, request):
+def ppost(resource, request, *args, **kwargs):
     request.resource_permission(DataScope.write)
 
     feature_id = int(request.matchdict['fid'])
@@ -169,17 +158,9 @@ def ppost(resource, request):
         raise FeatureNotFound(resource.id, feature_id)
 
     data = request.json_body
+    deserialize_pano_data(feature, data)
 
-    for feature_panorama_file in data.setdefault('files', []):
-        obj = FeatureScene(resource_id=feature.layer.id, feature_id=feature.id)
-        obj.deserialize(feature_panorama_file)
-        DBSession.add(obj)
-
-    obj = FeaturePanorama(resource_id=feature.layer.id, feature_id=feature.id, panorama=data.get('panorama', None))
-    DBSession.add(obj)
-
-    DBSession.flush()
-
+    obj = FeaturePanorama.filter_by(resource_id=feature.layer.id, feature_id=feature.id).one_or_none()
     return Response(
         json.dumps(obj.panorama),
         content_type='application/json',
@@ -212,7 +193,7 @@ def setup_pyramid(comp, config):
         'feature_panorama.scene.item.image',
         sceneiurl + '/image',
         factory=resource_factory) \
-        .add_view(image)
+        .add_view(s_image)
 
     config.add_route(
         'feature_panorama.item', panoramaurl,

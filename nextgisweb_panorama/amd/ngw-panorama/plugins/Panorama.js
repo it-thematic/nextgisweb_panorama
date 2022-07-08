@@ -25,6 +25,8 @@ define([
     i18n,
     psv,
 ) {
+    const BOY_ICON = 'data:image/png;base64,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'
+
     var Panorama = declare([BorderContainer], {
         closable: true,
         gutters: false,
@@ -61,16 +63,10 @@ define([
         },
 
         _getDefaultStyle: function () {
-            var strokeStyle = new ol.style.Stroke({
-                width: 3,
-                color: 'rgba(255б 0, 0, 1)'
-            });
-
             return new ol.style.Style({
-                stroke: strokeStyle,
-                image: new ol.style.Circle({
-                    stroke: strokeStyle,
-                    radius: 5
+                image: new ol.style.Icon({
+                    opacity: 1,
+                    src: BOY_ICON
                 })
             });
         },

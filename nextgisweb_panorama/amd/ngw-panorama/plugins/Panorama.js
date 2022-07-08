@@ -5,6 +5,7 @@ define([
     "dijit/layout/BorderContainer",
     "dijit/form/Button",
     "dijit/layout/TabContainer",
+    'ngw-webmap/ol/layer/Vector',
     "openlayers/ol",
     "ngw-webmap/plugin/_PluginBase",
     "@nextgisweb/pyramid/api",
@@ -17,6 +18,7 @@ define([
     BorderContainer,
     Button,
     TabContainer,
+    Vector,
     ol,
     _PluginBase,
     api,
@@ -27,6 +29,18 @@ define([
         closable: true,
         gutters: false,
         iconClass: "iconMap",
+
+        constructor: function (options) {
+            declare.safeMixin(this, options);
+            this._map = options.plugin.display.map;
+            this._overlay = new Vector('panorama_point', {
+                title: 'Pointer',
+                style: this._getDefaultStyle()
+            });
+            this._overlay.olLayer.setZIndex(1000);
+            this._source = this._overlay.olLayer.getSource();
+            this._map.addLayer(this._overlay);
+        },
 
         postCreate: function () {
             this.inherited(arguments);
@@ -46,7 +60,22 @@ define([
             }, 500);
         },
 
-        initialize_viewer: function (nodes) {
+        _getDefaultStyle: function () {
+            var strokeStyle = new ol.style.Stroke({
+                width: 3,
+                color: 'rgba(255б 0, 0, 1)'
+            });
+
+            return new ol.style.Style({
+                stroke: strokeStyle,
+                image: new ol.style.Circle({
+                    stroke: strokeStyle,
+                    radius: 5
+                })
+            });
+        },
+
+        initialize_viewer: function (nodes, point) {
             if (!!!this.viewer) {
                 this.viewer = new psv.PSV.Viewer({
                     caption: this.title,
@@ -66,10 +95,19 @@ define([
                 let vt = this.viewer.getPlugin(psv.VTP.VirtualTourPlugin);
                 vt.setNodes(nodes);
             }
+            var initPosition = ol.proj.transform(point, 'EPSG:3857', 'EPSG:4326');
+            var arrayOfDistances = [];
+            nodes.forEach(node => {
+                let distance = ol.sphere.getDistance(initPosition, node.position);
+                arrayOfDistances.push({distance: distance, node: node});
+            });
+            arrayOfDistances.sort((a, b) => a.distance - b.distance);
+            let vt = this.viewer.getPlugin(psv.VTP.VirtualTourPlugin);
+            vt.setCurrentNode(arrayOfDistances[0].node.id);
         },
 
         _bindEvents: function () {
-            topic.subscribe("feature.highlight", lang.hitch(this, this.loadPanoramaOfFeature));
+            topic.subscribe("panorama.open", lang.hitch(this, this.loadPanoramaOfFeature));
         },
 
         _bindPanoramaEvents: function () {
@@ -78,13 +116,15 @@ define([
         },
 
         _onPanoramaNodeChange: function (e, nodeId, data) {
-            this.plugin.display.featureHighlighter._unhighlightFeature();
+            this._source.clear();
+            // Установка маркера
             let vtp = this.viewer.getPlugin(psv.VTP.VirtualTourPlugin);
             let node = vtp.datasource.nodes[nodeId];
             let coord = ol.proj.transform(node.position, 'EPSG:4326', 'EPSG:3857')
             let point = new ol.geom.Point(coord);
-            this.plugin.display.featureHighlighter._highlightFeature({olGeometry: point});
+            this._source.addFeature(new ol.Feature({geometry: point}));
 
+            this.plugin.display.featureHighlighter._highlightFeature({olGeometry: point});
             let nextLink = this._calculateNextNode(node, data);
             if (!!!nextLink) {return; }
 
@@ -113,13 +153,13 @@ define([
         },
 
         loadPanoramaOfFeature: function (e) {
-            var layerId = e.layerId, featureId = e.featureId, widget = this;
+            var layerId = e.layerId, featureId = e.featureId, point = e.point, widget = this;
             if (!!!layerId || !!!featureId) { return; }
 
             api.route('feature_panorama.item', {id: layerId, fid: featureId})
                 .get()
                 .then(lang.hitch(this, (data) => {
-                    (data !== null) && (data.length > 0) ? widget.initialize_viewer(data) : null
+                    (data !== null) && (data.length > 0) ? widget.initialize_viewer(data, point) : null
                 }))
         }
     });

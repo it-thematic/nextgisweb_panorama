@@ -32,6 +32,8 @@ define([
         gutters: false,
         iconClass: "iconMap",
 
+        _panoListeners: [],
+
         constructor: function (options) {
             declare.safeMixin(this, options);
             this._map = options.plugin.display.map;
@@ -47,6 +49,13 @@ define([
         postCreate: function () {
             this.inherited(arguments);
             this._bindEvents();
+        },
+
+        destroy: function () {
+            this._source.clear();
+            delete this.viewer;
+            this._panoListeners.forEach(itm => itm.remove());
+            this.inherited(arguments);
         },
 
         _layoutChildren: function () {
@@ -103,7 +112,7 @@ define([
         },
 
         _bindEvents: function () {
-            topic.subscribe("panorama.open", lang.hitch(this, this.loadPanoramaOfFeature));
+            this._panoListeners.push(topic.subscribe("panorama.open", lang.hitch(this, this.loadPanoramaOfFeature)));
         },
 
         _bindPanoramaEvents: function () {
@@ -120,7 +129,6 @@ define([
             let point = new ol.geom.Point(coord);
             this._source.addFeature(new ol.Feature({geometry: point}));
 
-            this.plugin.display.featureHighlighter._highlightFeature({olGeometry: point});
             let nextLink = this._calculateNextNode(node, data);
             if (!!!nextLink) {return; }
 
@@ -161,8 +169,6 @@ define([
     });
 
     return declare([_PluginBase], {
-
-        pano: null,
 
         constructor: function () {
             var plugin = this;

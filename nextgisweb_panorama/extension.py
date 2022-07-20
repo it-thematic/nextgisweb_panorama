@@ -94,11 +94,11 @@ def deserialize_pano_data(feature, data):
                             panorama=pano_data
                             ).persist()
         else:
-
             pano_instance.panorama = pano_data
             pano_instance.persist()
     else:
-        DBSession.delete(pano_instance)
+        if pano_instance:
+            DBSession.delete(pano_instance)
 
 
 @FeatureExtension.registry.register

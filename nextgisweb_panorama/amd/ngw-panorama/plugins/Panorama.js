@@ -176,7 +176,9 @@ define([
             this.menuItem = new Button({
                 label: i18n.gettext("Panorama"),
                 showLabel: false,
-                iconClass: "material-icons material-icons-enable icon-panorama",
+                iconClass: "material-icons material-icons-enable",
+                "data-icon": "panorama",
+                _setIconClassAttr: { node: "titleNode", type: "class" },
                 disabled: true,
                 onClick: function () {
                     plugin.openPanorama();

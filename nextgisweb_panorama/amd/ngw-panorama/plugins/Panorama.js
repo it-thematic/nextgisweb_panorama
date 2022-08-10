@@ -53,6 +53,7 @@ define([
 
         destroy: function () {
             this._source.clear();
+            topic.publish('feature.unhighlight');
             delete this.viewer;
             this._panoListeners.forEach(itm => itm.remove());
             this.inherited(arguments);
